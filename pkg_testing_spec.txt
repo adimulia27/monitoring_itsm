@@ -1,0 +1,82 @@
+CREATE OR REPLACE PACKAGE OPHARAPP.PKG_TESTING AS
+/******************************************************************************
+   NAME:       PKG_TESTING
+   PURPOSE:
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        12/19/2016      Arif       1. Created this package.
+******************************************************************************/
+TYPE myrefcur IS REF CURSOR;
+
+    
+   
+    FUNCTION GET_KOREKSI_PEN_KWH_TS (IN_THBL        VARCHAR2,
+                                OUT_DATA            OUT MYREFCUR,
+                                OUT_MESSAGE         OUT VARCHAR2
+                            )   RETURN INT;
+                            
+    FUNCTION SIMPAN_UPLOAD_LOG( In_Id_Upload         VARCHAR2,
+                                In_Noagenda         VARCHAR2,
+                                In_Noba             VARCHAR2,
+                                In_NamaFile         VARCHAR2,
+                                Out_Message         OUT VARCHAR2
+                            )   RETURN NUMBER;
+                            
+    PROCEDURE REKAP_TAGLIS_HR (IN_PETUGASCATAT       VARCHAR2,
+                             IN_TGLAWAL           VARCHAR2,
+                             IN_TGLAKHIR            VARCHAR2,
+                             OUT_DATADETIL     OUT MYREFCUR,
+                             OUT_RET           OUT NUMBER,
+                             OUT_MESSAGE       OUT VARCHAR2);   
+                             
+    FUNCTION CREATE_USER (  
+        IN_ID_USER         VARCHAR2,
+        IN_UNITUP          VARCHAR2,
+        IN_NAMA_USER       VARCHAR2,
+        IN_ALAMAT_USER     VARCHAR2,
+        IN_NO_TELP         VARCHAR2,
+        IN_EMAIL           VARCHAR2,
+        IN_LEVELUSER       VARCHAR2,
+        IN_USERINSERT      VARCHAR2,
+        OUT_MESSAGE        OUT VARCHAR2
+        )
+    RETURN NUMBER;
+      
+    PROCEDURE GET_USER (
+        IN_ID_USER           VARCHAR2,
+        OUT_DATA_USER       OUT MYREFCUR,
+        OUT_DATA_ROLE       OUT MYREFCUR
+        ) ;
+                      
+    FUNCTION SIMPAN_USER_ROLE (
+        IN_ID_USER              VARCHAR2,
+        IN_ID_GROUP               VARCHAR2,
+        IN_AKSI            VARCHAR2,
+        IN_DISABLED                NUMBER,
+        OUT_MESSAGE          OUT VARCHAR2
+        )      
+        RETURN NUMBER ;                         
+            
+    FUNCTION SIMPAN_USERTAB (
+        IN_ID_USER         VARCHAR2,
+        IN_UNITUP          VARCHAR2,
+        IN_NAMA_USER       VARCHAR2,
+        IN_ALAMAT_USER     VARCHAR2,
+        IN_NO_TELP         VARCHAR2,
+        IN_EMAIL           VARCHAR2,
+        IN_LEVELUSER       VARCHAR2,
+        IN_USERUPDATE      VARCHAR2,
+        IN_DISABLE_USER     VARCHAR2,
+        IN_PASSWD           VARCHAR2,
+        IN_AKSI      VARCHAR2,
+        OUT_MESSAGE        OUT VARCHAR2
+        )      
+        RETURN NUMBER ;
+        
+        
+        /*** Project Dashboard ITSM ***/   
+        
+END PKG_TESTING;
+/

@@ -1,0 +1,509 @@
+CREATE OR REPLACE PACKAGE BODY OPHARAPP.PKG_TESTING AS
+/******************************************************************************
+   NAME:       PKG_TESTING
+   PURPOSE: belajar
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        12/19/2016      Arif       1. Created this package body.
+******************************************************************************/
+
+  
+   
+    FUNCTION GET_KOREKSI_PEN_KWH_TS (
+        IN_THBL       VARCHAR2,
+        OUT_DATA      OUT MYREFCUR,
+        OUT_MESSAGE   OUT VARCHAR2)
+    RETURN INT
+    IS
+    BEGIN
+        OPEN OUT_DATA FOR
+            SELECT  A.NOAGENDA,
+                    A.IDPEL,
+                    THBL,
+                    KDPEMBPP,
+                    TGL_PELUNASAN,
+                    TGLTRANSAKSI,
+                    PEMKWH,
+                    RPANGS,
+                    NO_TIKET,
+                    NO_BA,
+                    TO_CHAR (TGLTRANSAKSI, 'dd-mm-yyyy') AS TGLTRANSAKSI_DMY
+                FROM LOG_KOREKSI_TRANS_TS A
+                INNER JOIN LOG_PROSES_OPHARAPP B ON A.NOAGENDA = B.NOAGENDA  
+                INNER JOIN SIP3NONREK.DPPNONREKBARU C ON A.NOAGENDA = B.NOAGENDA
+                WHERE THBL = IN_THBL AND ROWNUM <= 30
+            ORDER BY TGLTRANSAKSI DESC;
+
+      OUT_MESSAGE := 'SUKSES';
+      RETURN 1;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         OUT_MESSAGE := SQLERRM;
+         RETURN -1;
+   END GET_KOREKSI_PEN_KWH_TS;
+   
+   -- simpan data
+   
+    FUNCTION SIMPAN_UPLOAD_LOG( In_Id_Upload           VARCHAR2,
+                                In_Noagenda           VARCHAR2,
+                                In_Noba               VARCHAR2,
+                                In_NamaFile           VARCHAR2,
+                                Out_Message           OUT VARCHAR2
+                            )
+    RETURN NUMBER
+    IS
+        V_COUNT        INT;
+        OUT_ROWCOUNT   NUMBER;
+    BEGIN
+      --      BEGIN
+
+        SELECT COUNT (*)
+        INTO V_COUNT
+        FROM OPHARAPP.LOG_PROSES_OPHARAPP 
+        WHERE NOAGENDA =  In_Noagenda;
+        
+        /* Vcount dibikin = 1 agar bisa insert di testing import excel | default: IF V_COUNT = 0  */
+        IF V_COUNT = 1
+        THEN
+            OUT_MESSAGE := 'No AGenda tidak ditemukan';
+            RETURN -1;
+        ELSE
+            INSERT INTO UPLOAD_LOG(ID_UPLOAD, NOAGENDA, NO_BA, NAMA_FILE)
+            VALUES(In_Id_Upload, In_Noagenda, In_Noba, In_NamaFile);
+            OUT_MESSAGE := '0';
+            RETURN 1;
+        END IF;
+   END SIMPAN_UPLOAD_LOG;
+
+-- PKG DARI MAS SINTO
+ PROCEDURE REKAP_TAGLIS_HR (in_petugascatat       VARCHAR2,
+                             IN_TGLAWAL            VARCHAR2,
+                             IN_TGLAKHIR            VARCHAR2,
+                             out_datadetil     OUT myrefcur,
+                             out_ret           OUT NUMBER,
+                             out_message       OUT VARCHAR2)
+   IS
+   BEGIN
+      out_message := NULL;
+      out_ret := 0;
+
+
+   OPEN out_datadetil FOR
+     /* Formatted on 10/11/2016 7:39:29 PM (QP5 v5.256.13226.35538) */
+WITH CARGO
+     AS (  SELECT    SUBSTR (TGLBAYAR, 5, 4)
+                  || SUBSTR (TGLBAYAR, 3, 2)
+                  || SUBSTR (TGLBAYAR, 1, 2)
+                     TGLBAYAR,
+                  COUNT (1) LBRCARGO,
+                  SUM (rptaG + RPBK) rptagcargo
+             FROM AP2TCARGO.lunas_qa1
+            WHERE        SUBSTR (TGLBAYAR, 5, 4)
+                      || SUBSTR (TGLBAYAR, 3, 2)
+                      || SUBSTR (TGLBAYAR, 1, 2) BETWEEN IN_TGLAWAL
+                                                     AND IN_TGLAKHIR
+                  AND REFNUM NOT IN (SELECT REFNUM
+                                       FROM ap2tcargo.lunas_qab
+                                      WHERE    SUBSTR (TGLBAYAR, 5, 4)
+                                            || SUBSTR (TGLBAYAR, 3, 2) =
+                                               SUBSTR(IN_TGLAWAL,1,6)--and kirim='Y'
+                                    )
+         GROUP BY TGLBAYAR),
+     AP2T
+     AS (  SELECT TGLBAYAR, SUM (JMLAP2T) LBRAP2T, SUM (RPTAGDPH) rptagdph
+             FROM (  SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3single.dphbaru
+                      WHERE     tglbayar BETWEEN IN_TGLAWAL AND IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singlejateng.dphbaru
+                      WHERE     tglbayar BETWEEN IN_TGLAWAL AND IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singlejabar.dphbaru
+                      WHERE     tglbayar BETWEEN IN_TGLAWAL AND IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singlejaya.dphbaru
+                      WHERE     tglbayar BETWEEN IN_TGLAWAL AND IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singlebali.dphbaru
+                      WHERE     tglbayar BETWEEN    IN_TGLAWAL
+                                             AND    IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singlebarat.dphbaru
+                      WHERE     tglbayar BETWEEN    IN_TGLAWAL
+                                             AND    IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singletengah.dphbaru
+                      WHERE     tglbayar BETWEEN IN_TGLAWAL
+                                             AND IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR
+                   UNION
+                     SELECT TGLBAYAR,
+                            COUNT (1) JMLAP2T,
+                            SUM (rptaG + RPBK1 + RPBK2 + RPBK3) rptagdph
+                       FROM sip3singletimur.dphbaru
+                      WHERE     tglbayar BETWEEN    IN_TGLAWAL
+                                             AND    IN_TGLAKHIR
+                            AND kdgerakkeluar IN ('22', '25')
+                            AND tglbataltrans IS NULL
+                   GROUP BY TGLBAYAR)
+         GROUP BY TGLBAYAR)
+  SELECT 'TAGLIS' keterangan,
+         A.TGLBAYAR,
+         LBRCARGO,
+         LBRAP2T,
+         rptagcargo,
+         rptagdph,
+         LBRCARGO - LBRAP2T SELISIH,
+         rptagcargo - rptagdph selisihtag
+    FROM CARGO A, AP2T B
+   WHERE A.TGLBAYAR = B.TGLBAYAr(+)
+   ORDER BY 2;
+   
+      
+   END REKAP_TAGLIS_HR;
+
+   FUNCTION CREATE_USER (      IN_ID_USER         VARCHAR2,
+                               IN_UNITUP          VARCHAR2,
+                               IN_NAMA_USER       VARCHAR2,
+                               IN_ALAMAT_USER     VARCHAR2,
+                               IN_NO_TELP         VARCHAR2,
+                               IN_EMAIL           VARCHAR2,
+                               IN_LEVELUSER       VARCHAR2,
+                               IN_USERINSERT      VARCHAR2,
+                               OUT_MESSAGE         OUT VARCHAR2)
+    RETURN NUMBER
+    IS
+        V_COUNT        INT;
+        OUT_ROWCOUNT   NUMBER;
+    BEGIN
+      --      BEGIN
+
+        SELECT COUNT (*)
+        INTO V_COUNT
+        FROM OPHARAPP.USERTAB
+        WHERE ID_USER =  IN_ID_USER;
+       
+        IF V_COUNT > 0
+        THEN
+            OUT_MESSAGE := 'ID User sudah digunakan.';
+            RETURN -1;
+        ELSE
+            INSERT INTO OPHARAPP.USERTAB(   
+                ID_USER, 
+                UNITUP, 
+                NAMA_USER, 
+                ALAMAT_USER,
+                NO_TELP,
+                EMAIL,
+                LEVELUSER,
+                DISABLE_USER,
+                PASSWD,
+                TGLINSERT,
+                USERINSERT
+            )
+            VALUES( 
+                IN_ID_USER, 
+                IN_UNITUP, 
+                IN_NAMA_USER, 
+                IN_ALAMAT_USER,
+                IN_NO_TELP,
+                IN_EMAIL,
+                IN_LEVELUSER,
+                0,
+                'icon+123',
+                SYSDATE,
+                IN_USERINSERT
+            );
+            OUT_MESSAGE := '0';
+            RETURN 1;
+        END IF;
+   END CREATE_USER;
+
+    PROCEDURE GET_USER (
+        IN_ID_USER VARCHAR2, 
+        OUT_DATA_USER OUT MYREFCUR,
+        OUT_DATA_ROLE OUT MYREFCUR
+        )
+        IS
+        BEGIN
+        OPEN OUT_DATA_USER FOR
+            SELECT ID_USER,
+                UNITUP,
+                NAMA_USER,
+                ALAMAT_USER,
+                NO_TELP,
+                EMAIL,
+                DISABLE_USER,
+                PASSWD,
+                LEVELUSER,
+                TGLINSERT,
+                USERINSERT,
+                TGLUPDATE,
+                USERUPDATE
+            FROM OPHARAPP.USERTAB
+            WHERE ID_USER = IN_ID_USER;
+
+      OPEN OUT_DATA_ROLE FOR
+            SELECT ID_USER, ID_GROUP, DISABLED
+            FROM OPHARAPP.USRGROUP
+            WHERE ID_USER = IN_ID_USER;
+   END GET_USER;
+
+
+    FUNCTION SIMPAN_USER_ROLE (
+        IN_ID_USER          VARCHAR2,
+        IN_ID_GROUP         VARCHAR2,
+        IN_AKSI             VARCHAR2,
+        IN_DISABLED         NUMBER,
+        OUT_MESSAGE         OUT VARCHAR2)
+    RETURN NUMBER
+    IS
+        V_COUNT        INT;
+        OUT_ROWCOUNT   NUMBER;
+    BEGIN
+      --      BEGIN
+      
+        IF IN_AKSI = 'TAMBAH'
+        THEN
+            SELECT COUNT (*)
+            INTO V_COUNT
+            FROM OPHARAPP.USRGROUP
+            WHERE ID_USER = IN_ID_USER AND ID_GROUP = IN_ID_GROUP;
+
+            IF V_COUNT > 0
+                THEN
+                OUT_MESSAGE := 'User sudah memiliki Role yang sama';
+                RETURN -1;
+            END IF;
+            -- sql tambah
+            INSERT INTO OPHARAPP.USRGROUP
+                (ID_USER, ID_GROUP, DISABLED )
+                VALUES
+                (IN_ID_USER, IN_ID_GROUP, IN_DISABLED );
+
+      --
+            OUT_ROWCOUNT := SQL%ROWCOUNT;
+          
+            IF OUT_ROWCOUNT <> 1
+            THEN
+                ROLLBACK;
+                OUT_MESSAGE := 'GAGAL INSERT USRGROUP';
+                RETURN 0;
+            END IF;
+            
+        END IF;
+
+    IF IN_AKSI = 'UBAH'
+        THEN
+            SELECT COUNT (*)
+            INTO V_COUNT
+            FROM OPHARAPP.USRGROUP
+            WHERE ID_USER = IN_ID_USER AND ID_GROUP = IN_ID_GROUP;
+
+            IF V_COUNT = 0
+                THEN
+                OUT_MESSAGE := 'User tidak tersedia';
+                RETURN -1;
+            END IF;
+            -- sql ubah
+            UPDATE OPHARAPP.USRGROUP
+                SET DISABLED = IN_DISABLED
+                WHERE ID_USER = IN_ID_USER AND ID_GROUP = IN_ID_GROUP;
+      --
+            OUT_ROWCOUNT := SQL%ROWCOUNT;
+          
+            IF OUT_ROWCOUNT < 1
+            THEN
+                ROLLBACK;
+                OUT_MESSAGE := 'GAGAL UPDATE USRGROUP';
+                RETURN 0;
+            END IF;
+            
+        END IF;
+
+    IF IN_AKSI = 'HAPUS'
+        THEN
+            SELECT COUNT (*)
+            INTO V_COUNT
+            FROM OPHARAPP.USRGROUP
+            WHERE ID_USER = IN_ID_USER AND ID_GROUP = IN_ID_GROUP;
+
+            IF V_COUNT = 0
+                THEN
+                OUT_MESSAGE := 'Gagal Hapus! User tidak tersedia';
+                RETURN -1;
+            END IF;
+            -- sql hapus
+            DELETE  OPHARAPP.USRGROUP   
+            WHERE   ID_USER = IN_ID_USER AND ID_GROUP = IN_ID_GROUP;
+            --
+            OUT_ROWCOUNT := SQL%ROWCOUNT;
+          
+            IF OUT_ROWCOUNT < 1
+            THEN
+                ROLLBACK;
+                OUT_MESSAGE := 'GAGAL HAPUS DATA USRGROUP';
+                RETURN 0;
+            END IF;
+            
+        END IF;
+
+      --
+      COMMIT;
+      OUT_MESSAGE := '0';
+      RETURN 1;
+
+      
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         BEGIN
+            OUT_ROWCOUNT := 0;
+            OUT_MESSAGE := SQLERRM;
+            ROLLBACK;
+            RETURN 0;
+         END;
+   --      END;
+   END SIMPAN_USER_ROLE;
+   
+   
+   
+   FUNCTION SIMPAN_USERTAB (      
+        IN_ID_USER          VARCHAR2,
+        IN_UNITUP           VARCHAR2,
+        IN_NAMA_USER        VARCHAR2,
+        IN_ALAMAT_USER      VARCHAR2,
+        IN_NO_TELP          VARCHAR2,
+        IN_EMAIL            VARCHAR2,
+        IN_LEVELUSER        VARCHAR2,
+        IN_USERUPDATE       VARCHAR2,
+        IN_DISABLE_USER     VARCHAR2,
+        IN_PASSWD           VARCHAR2,
+        IN_AKSI             VARCHAR2,
+        OUT_MESSAGE         OUT VARCHAR2)
+    RETURN NUMBER
+    IS
+        V_COUNT        INT;
+        OUT_ROWCOUNT   NUMBER;
+    BEGIN
+      --      BEGIN
+
+        SELECT COUNT (*)
+        INTO V_COUNT
+        FROM OPHARAPP.USERTAB
+        WHERE ID_USER =  IN_ID_USER;
+       
+        IF V_COUNT = 0
+        THEN
+            OUT_MESSAGE := 'ID User tidak terdaftar.';
+            RETURN -1;
+        END IF;
+        
+        
+    IF IN_AKSI = 'UBAH'
+        THEN
+            -- sql ubah
+            UPDATE OPHARAPP.USERTAB
+            SET UNITUP = IN_UNITUP,
+                NAMA_USER = IN_NAMA_USER, 
+                ALAMAT_USER = IN_ALAMAT_USER,
+                NO_TELP = IN_NO_TELP,
+                EMAIL = IN_EMAIL,
+                LEVELUSER = IN_LEVELUSER,
+                DISABLE_USER = IN_DISABLE_USER,
+                PASSWD = IN_PASSWD,
+                USERUPDATE = IN_USERUPDATE,
+                TGLUPDATE = SYSDATE
+                WHERE ID_USER = IN_ID_USER;
+      --
+            OUT_ROWCOUNT := SQL%ROWCOUNT;
+        
+            IF OUT_ROWCOUNT < 1
+            THEN
+                ROLLBACK;
+                OUT_MESSAGE := 'GAGAL UPDATE USERTAB';
+                RETURN 0;
+            END IF;
+            
+        END IF;
+        
+        IF IN_AKSI = 'HAPUS'
+        THEN
+            -- sql hapus
+            DELETE  OPHARAPP.USERTAB WHERE   ID_USER = IN_ID_USER;
+            --
+            OUT_ROWCOUNT := SQL%ROWCOUNT;
+          
+            IF OUT_ROWCOUNT <> 1
+            THEN
+                ROLLBACK;
+                OUT_MESSAGE := 'GAGAL HAPUS DATA USERTAB';
+                RETURN 0;
+            END IF;
+            
+        END IF;
+        
+        --
+        COMMIT;
+        OUT_MESSAGE := '0';
+        RETURN 1;
+  
+        EXCEPTION
+            WHEN OTHERS
+            THEN
+            BEGIN
+                OUT_ROWCOUNT := 0;
+                OUT_MESSAGE := SQLERRM;
+                ROLLBACK;
+                RETURN 0;
+            END;
+        
+    END SIMPAN_USERTAB;
+
+   /*** Project Dashboard ITSM ***/   
+   
+END PKG_TESTING;
+/
