@@ -4,37 +4,37 @@ $PESAN = $this->session->userdata('PESAN');
 <script>
 
 function modal_family(family) {
-    document.getElementById("judul_header").innerHTML = "DETAIL TIKET AKTIF "+family;
+  document.getElementById("judul_header").innerHTML = "DETAIL TIKET AKTIF "+family;
 
-    $("#tb_incident").html('<div></div>');
-    var url = "<?php echo base_url('statistik/ajax_get_incident') ?>";
-        //var bidang_id = $(this).prop("lang");
-        $.ajax({
-          type: "POST",
-          url: url,
-          dataType: "html",
-          data: {
-            family : family
-          },
-          beforeSend: function () {
-                // non removable loading
-                $('#loading_modal').modal({
-                  backdrop: 'static', keyboard: false
-                });
-              },
-              success: function (data) {
-                $('#loading_modal').modal('hide');
-                  var dataDetail = JSON.parse(data);
-                  diagramDetail(dataDetail);
-                  // console.log(dataDetail.OUT_DATA_SERVICEGROUP);
-                // $("#tb_incident").html(data);
-                $("#head h3").empty();
-                $("#tabel_detail tbody").empty();
-                $('#modal_family').modal('show');
-              }
-            });
+  $("#tb_incident").html('<div></div>');
+  var url = "<?php echo base_url('statistik/ajax_get_incident') ?>";
+      //var bidang_id = $(this).prop("lang");
+      $.ajax({
+        type: "POST",
+        url: url,
+        dataType: "html",
+        data: {
+          family : family
+        },
+        beforeSend: function () {
+              // non removable loading
+              $('#loading_modal').modal({
+                backdrop: 'static', keyboard: false
+              });
+            },
+            success: function (data) {
+              $('#loading_modal').modal('hide');
+                var dataDetail = JSON.parse(data);
+                diagramDetail(dataDetail);
+                // console.log(dataDetail.OUT_DATA_SERVICEGROUP);
+              // $("#tb_incident").html(data);
+              $("#head h3").empty();
+              $("#tabel_detail tbody").empty();
+              $('#modal_family').modal('show');
+            }
+          });
 
-      }
+  }
 
    function modal_tabel(family, group) {
     // $("#tb_incident").html('<div></div>');
@@ -83,7 +83,7 @@ function modal_family(family) {
 
       } 
   function modal_grafik(family) {
-    document.getElementById("judul_header").innerHTML = "DETAIL TIKET "+family;
+    document.getElementById("judul_header").innerHTML = "DETAIL TIKET"+family;
 
     $("#head h3").empty();
     $("#tabel_detail tbody").empty();

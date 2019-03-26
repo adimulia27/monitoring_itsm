@@ -272,22 +272,22 @@ $PESAN = $this->session->userdata('PESAN');
 
   <script>
 	// highcharts
-	// Radialize the colors
-  Highcharts.setOptions({
-   colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
-    return {
-     radialGradient: {
-      cx: 0.5,
-      cy: 0.3,
-      r: 0.7
-    },
-    stops: [
-    [0, color],
-						[1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
+	  // Radialize the colors
+    Highcharts.setOptions({
+     colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+      return {
+        radialGradient: {
+        cx: 0.5,
+        cy: 0.3,
+        r: 0.7
+        },
+        stops: [
+          [0, color],
+    			[1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
            ]
-         };
-       })
- });
+        };
+      })
+    });
 		// Build the chart
 		Highcharts.chart('family_chart', {
 			credits: {
@@ -329,13 +329,13 @@ $PESAN = $this->session->userdata('PESAN');
           y: <?php echo $family['TOTAL']; ?> ,
 
           color: {
-    //linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-    radialGradient: { cx: 0.5, cy: 0.5, r: 0.5 },
-    stops: [
-    [0, 'YELLOW'],
-    [1, "<?php  echo $rs_warna[$i]; ?>"]
-    ]
-  },
+            //linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+            radialGradient: { cx: 0.5, cy: 0.5, r: 0.5 },
+            stops: [
+            [0, 'YELLOW'],
+            [1, "<?php  echo $rs_warna[$i]; ?>"]
+            ]
+          },
           //  color : "<?php  echo $rs_warna[$i]; ?>" ,
           events: {
             click: function() {
@@ -347,11 +347,7 @@ $PESAN = $this->session->userdata('PESAN');
 
        <?php }?>
        ]
-
-
-     }
-
-     ]
+     }]
    });
 
     
@@ -479,28 +475,26 @@ $PESAN = $this->session->userdata('PESAN');
     var table;
     table = $('#tb_'+familyGroup).DataTable({
       "ajax": {
-        "url": "<?php echo base_url('statistik/dokumen_load_params') ?>",
-        "type": "POST",
-        "data": {"family": familyGroup},
-      },
-      "paging": true,
-            // "pageLength": 3,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": false,
-            "info": false,
-            "autoWidth": false,
-          });
-        // $('#bcari').attr('disabled', 'disabled');
-        table.destroy();
-      }
+      "url": "<?php echo base_url('statistik/dokumen_load_params') ?>",
+      "type": "POST",
+      "data": {"family": familyGroup},
+    },
+    "paging": true,
+          // "pageLength": 3,
+          "lengthChange": false,
+          "searching": false,
+          "ordering": false,
+          "info": false,
+          "autoWidth": false,
+        });
+      // $('#bcari').attr('disabled', 'disabled');
+      table.destroy();
+  }
+</script>
 
-
-    </script>
-
-    <!-- ChartJS 1.0.1 -->
-    <script src="<?php echo base_url('assets/plugins/chartjs/Chart.min.js');?>"></script>
-    <!-- page script -->
+<!-- ChartJS 1.0.1 -->
+<script src="<?php echo base_url('assets/plugins/chartjs/Chart.min.js');?>"></script>
+<!-- page script -->
 
 
    

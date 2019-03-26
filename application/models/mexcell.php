@@ -33,13 +33,14 @@ public function insert2($params) {
         $RESOLVEDON = ($dt['RESOLVEDON'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['RESOLVEDON'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $MODIFIEDON = ($dt['MODIFIEDON'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['MODIFIEDON'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $CLOSEDDATE = ($dt['CLOSEDDATE'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['CLOSEDDATE'] ."', 'DD/MM/YYYY HH24:MI:SS')";
+        $SLALEVEL180PERSEN = ($dt['SLALEVEL180PERSEN'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['SLALEVEL180PERSEN'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $SLALEVEL1 = ($dt['SLALEVEL1'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['SLALEVEL1'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $SLALEVEL2 = ($dt['SLALEVEL2'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['SLALEVEL2'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $SLALEVEL3 = ($dt['SLALEVEL3'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['SLALEVEL3'] ."', 'DD/MM/YYYY HH24:MI:SS')";
         $ASSIGNEDON = ($dt['ASSIGNEDON'] == '30/12/1899 00:00:00') ? 'NULL' : "to_date('". $dt['ASSIGNEDON'] ."', 'DD/MM/YYYY HH24:MI:SS')";
-        
-        $sql = "INSERT INTO faisallubis.TIKET_ITSM_UPLOAD (INCIDENT, CASEOWNER, CASEOWNEREMAIL, COMPLAINANT, COMPLAINANTEMAIL, SUMMARY, SOURCE, CALLTYPE, STATUS, DESCRIPTION, SERVICEFAMILY, SERVICEGROUP, SERVICETYPE, CAUSE, RESOLUTION, CREATEDBY, CREATEDON, RESOLVEDBY, RESOLVEDON, MODIFIEDBY, MODIFIEDON, CLOSEDBY, CLOSEDDATE, SLALEVEL1, SLALEVEL2, SLALEVEL3, PRIORITY, PRIORITYNAME, ASSIGNTO, FIRSTCALLRESOLUTION, ASSIGNEDON,  TGLUPLOAD, UPLOADBY)
-        VALUES (:INCIDENT, :CASEOWNER, :CASEOWNEREMAIL, :COMPLAINANT, :COMPLAINANTEMAIL, :SUMMARY, :SOURCE, :CALLTYPE, :STATUS, EMPTY_CLOB(), :SERVICEFAMILY, :SERVICEGROUP, :SERVICETYPE, EMPTY_CLOB(), EMPTY_CLOB(), :CREATEDBY, $CREATEDON, :RESOLVEDBY, $RESOLVEDON, :MODIFIEDBY, $MODIFIEDON, :CLOSEDBY, $CLOSEDDATE, $SLALEVEL1, $SLALEVEL2, $SLALEVEL3, :PRIORITY, :PRIORITYNAME, :ASSIGNTO, :FIRSTCALLRESOLUTION, $ASSIGNEDON , SYSDATE, :UPLOADBY)
+     
+        $sql = "INSERT INTO faisallubis.TIKET_ITSM_UPLOAD (INCIDENT, PRIORITYNAME, SLACLASS, CASEOWNER, CASEOWNEREMAIL, UNITINDUK, UNITPELAKSANA, UNITSUB PELAKSANA, COMPLAINANT, COMPLAINANTEMAIL, SUMMARY, SOURCE, CALLTYPE, STATUS, DESCRIPTION, SERVICEFAMILY, SERVICEGROUP, SERVICETYPE, CAUSE, CAUSECODE, RESOLUTION, CREATEDBY, CREATEDON, TASKCREATEDON, ASSIGNTO, ASSIGNEDON, RESOLVEDBY, RESOLVEDON, MODIFIEDBY, MODIFIEDON, CLOSEDBY, CLOSEDDATE, PRIORITY, SLALEVEL180PERSEN, SLALEVEL1, SLALEVEL2, SLALEVEL3, FIRSTCALLRESOLUTION, TGLUPLOAD, UPLOADBY)
+        VALUES (:INCIDENT, :PRIORITYNAME, :SLACLASS, :CASEOWNER, :CASEOWNEREMAIL, :UNITINDUK, :UNITPELAKSANA, :UNITSUBPELAKSANA, :COMPLAINANT, :COMPLAINANTEMAIL, :SUMMARY, :SOURCE, :CALLTYPE, :STATUS, EMPTY_CLOB(), :SERVICEFAMILY, :SERVICEGROUP, :SERVICETYPE, EMPTY_CLOB(), EMPTY_CLOB(), EMPTY_CLOB(), :CREATEDBY, $CREATEDON, :TASKCREATEDON, :ASSIGNTO, $ASSIGNEDON, :RESOLVEDBY, $RESOLVEDON, :MODIFIEDBY, $MODIFIEDON, :CLOSEDBY, $CLOSEDDATE, :PRIORITY, $SLALEVEL180PERSEN, $SLALEVEL1, $SLALEVEL2, $SLALEVEL3, :FIRSTCALLRESOLUTION, SYSDATE, :UPLOADBY)
         RETURNING DESCRIPTION, CAUSE, RESOLUTION  INTO :DESCRIPTION, :CAUSE, :RESOLUTION";
 
         $stid = oci_parse($conn, $sql);
@@ -47,8 +48,13 @@ public function insert2($params) {
         $clob_CAUSE = oci_new_descriptor($conn, OCI_D_LOB);
         $clob_RESOLUTION = oci_new_descriptor($conn, OCI_D_LOB);
         oci_bind_by_name($stid, ":INCIDENT", $dt['INCIDENT']);
+        oci_bind_by_name($stid, ":PRIORITYNAME", $dt['PRIORITYNAME']);
+        oci_bind_by_name($stid, ":SLACLASS", $dt['SLACLASS']);
         oci_bind_by_name($stid, ":CASEOWNER", $dt['CASEOWNER']);
         oci_bind_by_name($stid, ":CASEOWNEREMAIL", $dt['CASEOWNEREMAIL']);
+        oci_bind_by_name($stid, ":UNITINDUK", $dt['UNITINDUK']);
+        oci_bind_by_name($stid, ":UNITPELAKSANA", $dt['UNITPELAKSANA']);
+        oci_bind_by_name($stid, ":UNITSUBPELAKSANA", $dt['UNITSUBPELAKSANA']);
         oci_bind_by_name($stid, ":COMPLAINANT", $dt['COMPLAINANT']);
         oci_bind_by_name($stid, ":COMPLAINANTEMAIL", $dt['COMPLAINANTEMAIL']);
         oci_bind_by_name($stid, ":SUMMARY", $dt['SUMMARY']);
@@ -60,6 +66,7 @@ public function insert2($params) {
         oci_bind_by_name($stid, ":SERVICEGROUP", $dt['SERVICEGROUP']);
         oci_bind_by_name($stid, ":SERVICETYPE", $dt['SERVICETYPE']);
         oci_bind_by_name($stid, ":CAUSE",  $clob_CAUSE, -1, OCI_B_CLOB);
+        oci_bind_by_name($stid, ":CAUSECODE",  $clob_CAUSE, -1, OCI_B_CLOB);
         oci_bind_by_name($stid, ":RESOLUTION",  $clob_RESOLUTION, -1, OCI_B_CLOB);
         oci_bind_by_name($stid, ":CREATEDBY", $dt['CREATEDBY']);
             // oci_bind_by_name($stid, ":CREATEDON", $dt['CREATEDON']);
@@ -74,7 +81,6 @@ public function insert2($params) {
             // oci_bind_by_name($stid, ":SLALEVEL2", $dt['SLALEVEL2']);
             // oci_bind_by_name($stid, ":SLALEVEL3", $dt['SLALEVEL3']);
         oci_bind_by_name($stid, ":PRIORITY", $dt['PRIORITY']);
-        oci_bind_by_name($stid, ":PRIORITYNAME", $dt['PRIORITYNAME']);
         oci_bind_by_name($stid, ":ASSIGNTO", $dt['ASSIGNTO']);
         oci_bind_by_name($stid, ":FIRSTCALLRESOLUTION", $dt['FIRSTCALLRESOLUTION']);
             //oci_bind_by_name($stid, ":ASSIGNEDON", $ASSIGNEDON);
@@ -114,51 +120,59 @@ public function insert2($params) {
         foreach ($params as $dt) {
 
                 // conversi
+            $TASKCREATEDON = ($dt['TASKCREATEDON'] == '30/12/1899 00:00:00') ? NULL : $dt['TASKCREATEDON'];
             $CREATEDON = ($dt['CREATEDON'] == '30/12/1899 00:00:00') ? NULL : $dt['CREATEDON'];
             $RESOLVEDON = ($dt['RESOLVEDON'] == '30/12/1899 00:00:00') ? NULL : $dt['RESOLVEDON'];
             $MODIFIEDON = ($dt['MODIFIEDON'] == '30/12/1899 00:00:00') ? NULL : $dt['MODIFIEDON'] ;
             $CLOSEDDATE = ($dt['CLOSEDDATE'] == '30/12/1899 00:00:00') ? NULL : $dt['CLOSEDDATE'] ;
+            $SLALEVEL180PERSEN = ($dt['SLALEVEL180PERSEN'] == '30/12/1899 00:00:00') ? NULL : $dt['SLALEVEL180PERSEN'] ;
             $SLALEVEL1 = ($dt['SLALEVEL1'] == '30/12/1899 00:00:00') ? NULL : $dt['SLALEVEL1'] ;
             $SLALEVEL2 = ($dt['SLALEVEL2'] == '30/12/1899 00:00:00') ? NULL : $dt['SLALEVEL2'] ;
             $SLALEVEL3 = ($dt['SLALEVEL3'] == '30/12/1899 00:00:00') ? NULL : $dt['SLALEVEL3'] ;
             $ASSIGNEDON = ($dt['ASSIGNEDON'] == '30/12/1899 00:00:00') ? NULL : $dt['ASSIGNEDON'] ;
         
-            $stid = oci_parse($this->pblmig_db->conn_id, 'begin PKG_TESTING.INSERT_ITSM_UPLOAD(:IN_INCIDENT, :IN_CASEOWNER, :IN_CASEOWNEREMAIL, :IN_COMPLAINANT, :IN_COMPLAINANTEMAIL, :IN_SUMMARY, :IN_SOURCE, :IN_CALLTYPE, :IN_STATUS, :IN_DESCRIPTION,:IN_SERVICEFAMILY, :IN_SERVICEGROUP, :IN_SERVICETYPE, :IN_CAUSE ,:IN_RESOLUTION, :IN_CREATEDBY, :IN_CREATEDON,:IN_RESOLVEDBY, :IN_RESOLVEDON, :IN_MODIFIEDBY, :IN_MODIFIEDON, :IN_CLOSEDBY, :IN_CLOSEDDATE,  :IN_SLACLASS,:IN_SLALEVEL1, :IN_SLALEVEL2,  :IN_SLALEVEL3,  :IN_PRIORITY, :IN_PRIORITYNAME, :IN_ASSIGNTO, :IN_FIRSTCALLRESOLUTION, :IN_ASSIGNEDON,:IN_UPLOADBY,:IN_REPLACE, :OUT_RETVAL, :OUT_MESSAGE); END;');
+            $stid = oci_parse($this->pblmig_db->conn_id, 'begin PKG_TESTING.INSERT_ITSM_UPLOAD(:IN_INCIDENT, :IN_PRIORITYNAME, :IN_SLACLASS, :IN_CASEOWNER, :IN_CASEOWNEREMAIL, :IN_UNITINDUK, :IN_UNITPELAKSANA, :IN_UNITSUBPELAKSANA, :IN_COMPLAINANT, :IN_COMPLAINANTEMAIL, :IN_SUMMARY, :IN_SOURCE, :IN_CALLTYPE, :IN_STATUS, :IN_DESCRIPTION, :IN_SERVICEFAMILY, :IN_SERVICEGROUP, :IN_SERVICETYPE, :IN_CAUSE, :IN_CAUSECODE, :IN_RESOLUTION, :IN_CREATEDBY, :IN_CREATEDON, :IN_TASKCREATEDON, :IN_ASSIGNTO, :IN_ASSIGNEDON, :IN_RESOLVEDBY, :IN_RESOLVEDON, :IN_MODIFIEDBY, :IN_MODIFIEDON, :IN_CLOSEDBY, :IN_CLOSEDDATE, :IN_PRIORITY, :IN_SLALEVEL180PERSEN, :IN_SLALEVEL1, :IN_SLALEVEL2, :IN_SLALEVEL3, :IN_FIRSTCALLRESOLUTION, :IN_UPLOADBY, :IN_REPLACE, :OUT_RETVAL, :OUT_MESSAGE); END;');
 
             //Send parameters variable  value  lenght
-            oci_bind_by_name($stid, ':IN_INCIDENT', $dt['INCIDENT']) or die('Error binding IN_INCIDENT') ;
+            oci_bind_by_name($stid, ':IN_INCIDENT', $dt['INCIDENT']) or die('Error binding IN_INCIDENT');
+            oci_bind_by_name($stid, ':IN_PRIORITYNAME', $dt['PRIORITYNAME']) or die('Error binding IN_PRIORITYNAME');
+            oci_bind_by_name($stid, ':IN_SLACLASS', $dt['SLACLASS']) or die('Error binding IN_SLACLASS') ;
             oci_bind_by_name($stid, ':IN_CASEOWNER', $dt['CASEOWNER']) or die('Error binding IN_CASEOWNER');
-            oci_bind_by_name($stid, ':IN_CASEOWNEREMAIL', $dt['CASEOWNEREMAIL']) or die('Error binding noagendalama');
+            oci_bind_by_name($stid, ':IN_CASEOWNEREMAIL', $dt['CASEOWNEREMAIL']) or die('Error binding CASEOWNEREMAIL');
+            oci_bind_by_name($stid, ':IN_UNITINDUK', $dt['UNITINDUK']) or die('Error binding IN_UNITINDUK') ;
+            oci_bind_by_name($stid, ':IN_UNITPELAKSANA', $dt['UNITPELAKSANA']) or die('Error binding IN_UNITPELAKSANA') ;
+            oci_bind_by_name($stid, ':IN_UNITSUBPELAKSANA', $dt['UNITSUBPELAKSANA']) or die('Error binding IN_UNITSUBPELAKSANA') ;
             oci_bind_by_name($stid, ':IN_COMPLAINANT', $dt['COMPLAINANT']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_COMPLAINANTEMAIL', $dt['COMPLAINANTEMAIL']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SUMMARY', $dt['SUMMARY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SOURCE', $dt['SOURCE']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CALLTYPE', $dt['CALLTYPE']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_STATUS', $dt['STATUS']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_DESCRIPTION', $dt['DESCRIPTION']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SERVICEFAMILY', $dt['SERVICEFAMILY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SERVICEGROUP', $dt['SERVICEGROUP']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SERVICETYPE', $dt['SERVICETYPE']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CAUSE', $dt['CAUSE']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_RESOLUTION', $dt['RESOLUTION']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CREATEDBY', $dt['CREATEDBY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CREATEDON', $CREATEDON) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_RESOLVEDBY', $dt['RESOLVEDBY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_RESOLVEDON', $RESOLVEDON) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_MODIFIEDBY', $dt['MODIFIEDBY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_MODIFIEDON', $MODIFIEDON) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CLOSEDBY', $dt['CLOSEDBY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_CLOSEDDATE', $CLOSEDDATE) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SLACLASS', $dt['SLACLASS']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SLALEVEL1', $SLALEVEL1) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SLALEVEL2', $SLALEVEL2) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_SLALEVEL3', $SLALEVEL3) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_PRIORITY', $dt['PRIORITY']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_PRIORITYNAME', $dt['PRIORITYNAME']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_ASSIGNTO', $dt['ASSIGNTO']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_FIRSTCALLRESOLUTION', $dt['FIRSTCALLRESOLUTION']) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_ASSIGNEDON', $ASSIGNEDON) or die('Error binding noagendalama');
-            oci_bind_by_name($stid, ':IN_UPLOADBY', $dt['UPLOADBY']) or die('Error binding noagendalama');
+            oci_bind_by_name($stid, ':IN_COMPLAINANTEMAIL', $dt['COMPLAINANTEMAIL']) or die('Error binding COMPLAINANTEMAIL');
+            oci_bind_by_name($stid, ':IN_SUMMARY', $dt['SUMMARY']) or die('Error binding SUMMARY');
+            oci_bind_by_name($stid, ':IN_SOURCE', $dt['SOURCE']) or die('Error binding SOURCE');
+            oci_bind_by_name($stid, ':IN_CALLTYPE', $dt['CALLTYPE']) or die('Error binding CALLTYPE');
+            oci_bind_by_name($stid, ':IN_STATUS', $dt['STATUS']) or die('Error binding STATUS');
+            oci_bind_by_name($stid, ':IN_DESCRIPTION', $dt['DESCRIPTION']) or die('Error binding DESCRIPTION');
+            oci_bind_by_name($stid, ':IN_SERVICEFAMILY', $dt['SERVICEFAMILY']) or die('Error binding SERVICEFAMILY');
+            oci_bind_by_name($stid, ':IN_SERVICEGROUP', $dt['SERVICEGROUP']) or die('Error binding SERVICEGROUP');
+            oci_bind_by_name($stid, ':IN_SERVICETYPE', $dt['SERVICETYPE']) or die('Error binding SERVICETYPE');
+            oci_bind_by_name($stid, ':IN_CAUSE', $dt['CAUSE']) or die('Error binding CAUSE');
+            oci_bind_by_name($stid, ':IN_CAUSECODE', $dt['CAUSECODE']) or die('Error binding CAUSECODE');
+            oci_bind_by_name($stid, ':IN_RESOLUTION', $dt['RESOLUTION']) or die('Error binding RESOLUTION');
+            oci_bind_by_name($stid, ':IN_CREATEDBY', $dt['CREATEDBY']) or die('Error binding CREATEDBY');
+            oci_bind_by_name($stid, ':IN_CREATEDON', $CREATEDON) or die('Error binding CREATEDON');
+            oci_bind_by_name($stid, ':IN_TASKCREATEDON', $TASKCREATEDON) or die('Error binding TASKCREATEDON');
+            oci_bind_by_name($stid, ':IN_ASSIGNTO', $dt['ASSIGNTO']) or die('Error binding ASSIGNTO');
+            oci_bind_by_name($stid, ':IN_ASSIGNEDON', $ASSIGNEDON) or die('Error binding ASSIGNEDON');
+            oci_bind_by_name($stid, ':IN_RESOLVEDBY', $dt['RESOLVEDBY']) or die('Error binding RESOLVEDBY');
+            oci_bind_by_name($stid, ':IN_RESOLVEDON', $RESOLVEDON) or die('Error binding RESOLVEDON');
+            oci_bind_by_name($stid, ':IN_MODIFIEDBY', $dt['MODIFIEDBY']) or die('Error binding MODIFIEDBY');
+            oci_bind_by_name($stid, ':IN_MODIFIEDON', $MODIFIEDON) or die('Error binding MODIFIEDON');
+            oci_bind_by_name($stid, ':IN_CLOSEDBY', $dt['CLOSEDBY']) or die('Error binding CLOSEDBY');
+            oci_bind_by_name($stid, ':IN_CLOSEDDATE', $CLOSEDDATE) or die('Error binding CLOSEDDATE');
+            oci_bind_by_name($stid, ':IN_PRIORITY', $dt['PRIORITY']) or die('Error binding PRIORITY');
+            oci_bind_by_name($stid, ':IN_SLALEVEL180PERSEN', $SLALEVEL180PERSEN) or die('Error binding SLALEVEL180PERSEN');
+            oci_bind_by_name($stid, ':IN_SLALEVEL1', $SLALEVEL1) or die('Error binding SLALEVEL1');
+            oci_bind_by_name($stid, ':IN_SLALEVEL2', $SLALEVEL2) or die('Error binding SLALEVEL2');
+            oci_bind_by_name($stid, ':IN_SLALEVEL3', $SLALEVEL3) or die('Error binding SLALEVEL3');
+            oci_bind_by_name($stid, ':IN_FIRSTCALLRESOLUTION', $dt['FIRSTCALLRESOLUTION']) or die('Error binding FIRSTCALLRESOLUTION');
+            oci_bind_by_name($stid, ':IN_UPLOADBY', $dt['UPLOADBY']) or die('Error binding UPLOADBY');
             oci_bind_by_name($stid, ':IN_REPLACE', $dt['REPLACE']) or die('Error binding Replace');
             oci_bind_by_name($stid, ':OUT_RETVAL', $retval,100, SQLT_CHR) or die('Error binding string12');
             oci_bind_by_name($stid, ':OUT_MESSAGE', $msg_out,100, SQLT_CHR) or die('Error binding string12');

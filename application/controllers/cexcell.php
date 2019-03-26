@@ -70,11 +70,17 @@ class cexcell extends CI_Controller {
 	//import database
 	public function importDataExcell(){
 		
-			if(!empty($this->input->post("btn_kirim_itsm", TRUE))){
-				$this->kirim_to_itsm();
-			}
-		try 
-		{
+		$kirim_itsm = $this->input->post("btn_kirim_itsm", TRUE);
+		
+		if(!empty($kirim_itsm)){
+			$this->kirim_to_itsm();
+		}
+		// if(!empty($this->input->post("btn_kirim_itsm", TRUE))){
+		// 	$this->kirim_to_itsm();
+		// }
+
+		try {
+
 			$inputFileName = $_FILES['file']['tmp_name'];
 			//print_r($inputFileName); exit();
 			//Lokasi file excel       
@@ -99,7 +105,7 @@ class cexcell extends CI_Controller {
 						$RESOLVEDON = new DateTime("1899-12-30 + ". round($row[27] * 86400) . " seconds");
 						$MODIFIEDON = new DateTime("1899-12-30 + ". round($row[29] * 86400) . " seconds");
 						$CLOSEDDATE = new DateTime("1899-12-30 + ". round($row[31] * 86400) . " seconds");
-						$SLALEVEL180 = new DateTime("1899-12-30 + ". round($row[33] * 86400) . " seconds");
+						$SLALEVEL180PERSEN = new DateTime("1899-12-30 + ". round($row[33] * 86400) . " seconds");
 						$SLALEVEL1 = new DateTime("1899-12-30 + ". round($row[34] * 86400) . " seconds");
 						$SLALEVEL2 = new DateTime("1899-12-30 + ". round($row[35] * 86400) . " seconds");
 						$SLALEVEL3 = new DateTime("1899-12-30 + ". round($row[36] * 86400) . " seconds");
@@ -139,14 +145,13 @@ class cexcell extends CI_Controller {
 							'CLOSEDBY' => $row[30],
 							'CLOSEDDATE' => $CLOSEDDATE->format("d/m/Y H:i:s"),
 							'PRIORITY' => $row[32],
-							'SLALEVEL180%' => $SLALEVEL1->format("d/m/Y H:i:s"),						
+							'SLALEVEL180PERSEN' => $SLALEVEL180PERSEN->format("d/m/Y H:i:s"),						
 							'SLALEVEL1' => $SLALEVEL1->format("d/m/Y H:i:s"),
 							'SLALEVEL2' => $SLALEVEL2->format("d/m/Y H:i:s"),
 							'SLALEVEL3' => $SLALEVEL3->format("d/m/Y H:i:s"),						
 							'FIRSTCALLRESOLUTION' => $row[37],
-							
-							//'TGLUPLOAD' => $row[32],
-							//'UPLOADBY' => $this->session->userdata('id_user'),
+							// 'TGLUPLOAD' => $row[38],
+							'UPLOADBY' => $this->session->userdata('id_user')
 							//'REPLACE' => $this->input->post("replace", TRUE)
 						);
 						
@@ -157,10 +162,10 @@ class cexcell extends CI_Controller {
 				
 			}
 			$message = $this->mexcell->insert_itsm_upload($params);             
-			//print_r($message); exit();
+			// print_r($params); exit();
 			$reader->close();
 			if($message == 'sukses'){
-				$this->session->set_flashdata('pesan', 'Data berhasil ditambahkan.');
+				$this->session->set_flashdata('pesan', $message);
 				redirect("cexcell");
 			}else{
 				$this->session->set_flashdata('gagal', $message);
@@ -171,17 +176,25 @@ class cexcell extends CI_Controller {
 			$this->session->set_flashdata('gagal', $e->getMessage());
 			redirect("cexcell");
 		}
+
 	}
 
 	public function kirim_to_itsm(){
 		$result = $this->mexcell->kirim_to_itsm();             
 		//print_r($message); exit();
 		if($result == 'sukses'){
-			$this->session->set_flashdata('pesan', 'Data berhasil dikirim.');
+			$this->session->set_flashdata('pesan', $result);
 			redirect("cexcell");
 		}else{
 			$this->session->set_flashdata('gagal', $result);
 			redirect("cexcell");
 		}
+	}
+
+	public function ambilNamaFile(){
+		// $namaFile = $this->input->POST('file');
+		$namaFile = $_FILES['file']['name'];
+
+		echo $namaFile;
 	}
 }

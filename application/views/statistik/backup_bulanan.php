@@ -1,21 +1,6 @@
 <?php
 $PESAN = $this->session->userdata('PESAN');
 ?>
-
-<script type="text/javascript">
-  
-      function changeIcon(id_collapse) {
-       // alert('Id = ' + id_collapse);
-       $("#" + id_collapse).on('shown.bs.collapse', function() {
-        $("#fa_" + id_collapse).addClass('fa-minus').removeClass('fa-plus');
-      });
-       $("#" + id_collapse).on('hidden.bs.collapse', function() {
-        $("#fa_" + id_collapse).addClass('fa-plus').removeClass('fa-minus');
-      });
-     }
-
-</script>
-
 <input type="hidden" value="" id="noagendaVALUE">
 <section class="content">
   <!-- Main row -->
@@ -61,7 +46,6 @@ $PESAN = $this->session->userdata('PESAN');
                       </div>
                     </div>
                   </div>
-                  <input type="text" name="INTANGGAL" class="form-control" id="INTANGGAL" value="<?php echo $INTANGGAL; ?>" >
                   <div class="col-md-4">
                     <div class="form-group">
                       <div class="col-sm-12">
@@ -217,45 +201,6 @@ $PESAN = $this->session->userdata('PESAN');
       </div><!-- /.box -->
       <!-- /.box -->
 
-      <div class="modal fade modal-primary" id="modal_family">
-    <div class="modal-dialog modal-lg" style="width: 90%">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="judul_header">Detail</h4>
-          </div>
-          <div class="modal-body" style="background-color: #FFF !important">
-            <div class="box-body scroll-y">
-
-
-
-
-              <div id="tb_incident1">
-
-
-
-
-              </div>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-
-
-    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="loading_modal">
-      <div class="modal-dialog modal-sm" role="document">
-        <img src="<?php echo base_url('assets/dist/img/ajax-loader.gif');?>" alt="" />
-      </div>
-    </div>
-
 
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -264,23 +209,7 @@ $PESAN = $this->session->userdata('PESAN');
 
 
 
-<script type="text/javascript">
-  // Radialize the colors
-  Highcharts.setOptions({
-   colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
-    return {
-      radialGradient: {
-      cx: 0.5,
-      cy: 0.3,
-      r: 0.7
-      },
-      stops: [
-        [0, color],
-        [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
-         ]
-      };
-    })
-  });
+    <script type="text/javascript">
   // Bar Chart total tiket
   Highcharts.chart('totat_tiket_barchart', {
     chart: {
@@ -291,9 +220,10 @@ $PESAN = $this->session->userdata('PESAN');
     },
     xAxis: {
       categories: [
-        <?php foreach ($rs_total_tiket as $nama_family) {
-          echo "'".$nama_family['SERVICEFAMILY']."',";
-        } ?>
+      <?php foreach ($rs_total_tiket as $nama_family) {
+        echo "'".$nama_family['SERVICEFAMILY']."',";
+      } ?>
+      
       ]
     },
     yAxis: [{
@@ -317,8 +247,7 @@ $PESAN = $this->session->userdata('PESAN');
       column: {
         grouping: false,
         shadow: false,
-        borderWidth: 0,
-        cursor: 'pointer',
+        borderWidth: 0
       }
     },
     series: [
@@ -331,66 +260,18 @@ $PESAN = $this->session->userdata('PESAN');
     // }, 
     {
       name: 'TOTAL TIKET',
-      // color: 'rgba(126,86,134,.9)',
+      color: 'rgba(126,86,134,.9)',
       data: [
-        <?php foreach ($rs_total_tiket  as $total_tiket) {
+<?php foreach ($rs_total_tiket  as $total_tiket) {
         echo $total_tiket['TOTAL'].",";
       } ?>
       //140, 90, 40
       ],
       pointPadding: 0.1,
-      point: {
-             events: {
-                click: function() {
-                     modal_family(this.category);
-                     //alert ('Category: '+ this.category +', value: '+ this.y);
-                }
-            }
-        },
 
-      events : function() {
-        totat_tiket_barchart(this.name);
-      }
     }]
   });
-
-function modal_family(family) {
-    document.getElementById("judul_header").innerHTML = "DETAIL TIKET Perbulan "+family+<?php echo $search['bulan'].$search['tahun']; ?>;
-    // alert(<?php echo $search['bulan'].$search['tahun']; ?>);
-    $("#tb_incident1").html('<div></div>');
-    var url = "<?php echo base_url('statistik/ajax_get_incident_bulanan') ?>";
-        //var bidang_id = $(this).prop("lang");
-        $.ajax({
-          type: "POST",
-          url: url,
-          dataType: "html",
-          data: {
-            'family' :family,
-            // "BLTH" : "032019"
-            'BLTH' : "<?php echo $search['tahun'].$search['bulan']; ?>"
-          },
-          beforeSend: function () {
-                // non removable loading
-                $('#loading_modal').modal({
-                  backdrop: 'static', keyboard: false
-                });
-              },
-              success: function (data) {
-                $('#loading_modal').modal('hide');
-                $('#modal_family').modal('show');
-                $("#tb_incident1").html(data);
-               
-               //console.log(data);
-              }
-            });
-
-} 
-
 </script>
-
-
-
-
 <script type="text/javascript">
   // Bar Chart total SLA
   Highcharts.chart('totat_sla_barchart', {
@@ -438,19 +319,12 @@ function modal_family(family) {
       name: 'Over SLA',
       color: 'rgba(165,170,217,1)',
       data: [
-        <?php foreach ($rs_tiket_sla  as $data) {
-          echo $data['TOTAL_SLA'].",";
-        } ?>
+<?php foreach ($rs_tiket_sla  as $data) {
+        echo $data['TOTAL_SLA'].",";
+      } ?>
       ],
       pointPadding: 0.1,
-      point: {
-             events: {
-                click: function() {
-                    //modal_grafik(this.category);
-                     console.log ('Category: ');
-                }
-            }
-        },
+
     }, 
     // {
     //     name: 'Tiket Resolved',

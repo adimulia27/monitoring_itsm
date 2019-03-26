@@ -97,7 +97,8 @@
                                 <th>SLALEVEL2</th>
                                 <th>SLALEVEL3</th>
                                 <th>FIRSTCALLRESOLUTION</th>
-                                
+                                <th>TGLUPLOAD</th>
+                                <th>UPLOADBY</th>
                             </tr>
                         </thead>
 						<tbody>
@@ -296,17 +297,6 @@
 							
 							<td><?php echo $itsm['CREATEDON'];?></td>
 							<td><?php echo $itsm['TASKCREATEDON'];?></td>							
-							<td><?php echo $itsm['RESOLVEDBY'];?></td>
-							<td><?php echo $itsm['RESOLVEDON'];?></td>
-							<td><?php echo $itsm['MODIFIEDBY'];?></td>
-							<td><?php echo $itsm['MODIFIEDON'];?></td>
-							<td><?php echo $itsm['CLOSEDBY'];?></td>
-							<td><?php echo $itsm['CLOSEDDATE'];?></td>
-							<td><?php echo $itsm['PRIORITY'];?></td>
-							<td><?php echo $itsm['SLALEVEL1_80'];?></td>
-							<td><?php echo $itsm['SLALEVEL1'];?></td>
-							<td><?php echo $itsm['SLALEVEL2'];?></td>
-							<td><?php echo $itsm['SLALEVEL3'];?></td>							
 							<td>
 								<?php 
 									$assignto = strlen($itsm['ASSIGNTO']);
@@ -317,8 +307,21 @@
 									}
 								?>
 							</td>
+							<td><?php echo $itsm['ASSIGNEDON'];?></td>							
+							<td><?php echo $itsm['RESOLVEDBY'];?></td>
+							<td><?php echo $itsm['RESOLVEDON'];?></td>
+							<td><?php echo $itsm['MODIFIEDBY'];?></td>
+							<td><?php echo $itsm['MODIFIEDON'];?></td>
+							<td><?php echo $itsm['CLOSEDBY'];?></td>
+							<td><?php echo $itsm['CLOSEDDATE'];?></td>
+							<td><?php echo $itsm['PRIORITY'];?></td>
+							<td><?php echo $itsm['SLALEVEL180PERSEN'];?></td>
+							<td><?php echo $itsm['SLALEVEL1'];?></td>
+							<td><?php echo $itsm['SLALEVEL2'];?></td>
+							<td><?php echo $itsm['SLALEVEL3'];?></td>
 							<td><?php echo $itsm['FIRSTCALLRESOLUTION'];?></td>
-							<td><?php echo $itsm['ASSIGNEDON'];?></td>
+							<td><?php echo $itsm['TGLUPLOAD'];?></td>							
+							<td><?php echo $itsm['UPLOADBY'];?></td>
 						</tr>
 						<?php };?>
 						</tbody>

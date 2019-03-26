@@ -33,25 +33,25 @@ class mstatistik extends CI_Model {
 
 
     // GET TOTAL TIKET BY FAMILY - DONUT CHART
-    public function get_total_family() {
-        $sql = "SELECT  SUBSTR(SERVICEFAMILY, 5, 10) as SERVICEFAMILY_SUBSTR, SERVICEFAMILY , count(*) as total 
-                FROM faisallubis.TIKET_ITSM 
-                WHERE STATUS = 'Active' 
-                AND to_char(CREATEDON, 'mm/dd/yyyy') = to_char(sysdate-1, 'mm/dd/yyyy')
-                group by SERVICEFAMILY
-                ORDER BY total DESC
-        ";
-        $query = $this->db->query($sql);
+    // public function get_total_family() {
+    //     $sql = "SELECT  SUBSTR(SERVICEFAMILY, 5, 10) as SERVICEFAMILY_SUBSTR, SERVICEFAMILY , count(*) as total 
+    //             FROM faisallubis.TIKET_ITSM 
+    //             WHERE STATUS = 'Active' 
+    //             AND to_char(CREATEDON, 'mm/dd/yyyy') = to_char(sysdate-1, 'mm/dd/yyyy')
+    //             group by SERVICEFAMILY
+    //             ORDER BY total DESC
+    //     ";
+    //     $query = $this->db->query($sql);
 
 
-        if ($query->num_rows() > 0) {
-            $result = $query->result_array();
-            $query->free_result();
-            return $result;
-        } else {
-            return NULL;
-        }
-    }
+    //     if ($query->num_rows() > 0) {
+    //         $result = $query->result_array();
+    //         $query->free_result();
+    //         return $result;
+    //     } else {
+    //         return NULL;
+    //     }
+    // }
 
 
     // GET TOTAL TIKET BY FAMILY
@@ -680,7 +680,7 @@ public function get_total_tiket() {
     }
 
     // DATA STATISTIK PERBULAN
-    public function get_pkg_incident_perbulan($blth){
+    public function get_pkg_incident_perbulan($params){
         $msg_out = '';
         $results = '';
         $this->pblmig_db = $this->load->database('pblmig', true);
@@ -689,19 +689,21 @@ public function get_total_tiket() {
             trigger_error(htmlentities($m['message']), E_USER_ERROR);
         }
 
-        $stid = oci_parse($this->pblmig_db->conn_id, 'begin OPHARAPP.PKG_TESTING.GET_DATA_INCIDENT_PERBULAN(:IN_BLTH, :OUT_DATA_TOTAL_TIKET, :OUT_DATA_LIST_SLA, :OUT_DATA_TIKET_BY_BULAN, :OUT_TIKET_TOTAL, :OUT_TIKET_OVERSLA, :OUT_TIKET_RESOLVED, :OUT_MESSAGE); end;');
+        $stid = oci_parse($this->pblmig_db->conn_id, 'begin OPHARAPP.PKG_TESTING.GET_DATA_INCIDENT_PERBULAN(:IN_BLTH, :OUT_DATA_TOTAL_TIKET, :OUT_DATA_LIST_SLA, :OUT_DATA_TIKET_BY_BULAN, :OUT_TIKET_TOTAL, :OUT_TIKET_OVERSLA, :OUT_TIKET_RESOLVED, :OUT_TIKET_RESOLVED_AVG, :OUT_MESSAGE); end;');
         $OUT_DATA_TOTAL_TIKET = oci_new_cursor($this->pblmig_db->conn_id);
         $OUT_DATA_LIST_SLA = oci_new_cursor($this->pblmig_db->conn_id);
         $OUT_DATA_TIKET_BY_BULAN = oci_new_cursor($this->pblmig_db->conn_id);
+        $OUT_TIKET_RESOLVED_AVG = oci_new_cursor($this->pblmig_db->conn_id);
 
         //Send parameters variable  value  lenght
-        oci_bind_by_name($stid, ':IN_BLTH', $blth) or die('Error binding IN_BLTH');
+        oci_bind_by_name($stid, ':IN_BLTH', $params) or die('Error binding IN_BLTH');
         oci_bind_by_name($stid, ':OUT_DATA_TOTAL_TIKET', $OUT_DATA_TOTAL_TIKET,-1, OCI_B_CURSOR) or die('Error bind OUT_DATA');
         oci_bind_by_name($stid, ':OUT_DATA_LIST_SLA', $OUT_DATA_LIST_SLA,-1, OCI_B_CURSOR) or die('Error binding OUT_DATA');
         oci_bind_by_name($stid, ':OUT_DATA_TIKET_BY_BULAN', $OUT_DATA_TIKET_BY_BULAN,-1, OCI_B_CURSOR) or die('Error binding OUT_DATA');
         oci_bind_by_name($stid, ':OUT_TIKET_TOTAL', $results['OUT_TIKET_TOTAL'],100, SQLT_CHR) or die('Error binding total');
         oci_bind_by_name($stid, ':OUT_TIKET_OVERSLA', $results['OUT_TIKET_OVERSLA'],100, SQLT_CHR) or die('Error binding oversla');
         oci_bind_by_name($stid, ':OUT_TIKET_RESOLVED', $results['OUT_TIKET_RESOLVED'],100, SQLT_CHR) or die('Error binding resolved');
+        oci_bind_by_name($stid, ':OUT_TIKET_RESOLVED_AVG', $OUT_TIKET_RESOLVED_AVG,-1, OCI_B_CURSOR) or die('Error binding OUT_DATA');
         oci_bind_by_name($stid, ':OUT_MESSAGE', $msg_out,100, SQLT_CHR) or die('Error binding Message');
         //Bind Cursor     put -1
         $func_result = oci_execute($stid);
@@ -709,9 +711,11 @@ public function get_total_tiket() {
             oci_execute($OUT_DATA_TOTAL_TIKET, OCI_DEFAULT);
             oci_execute($OUT_DATA_LIST_SLA, OCI_DEFAULT);
             oci_execute($OUT_DATA_TIKET_BY_BULAN, OCI_DEFAULT);
+            oci_execute($OUT_TIKET_RESOLVED_AVG, OCI_DEFAULT);
             oci_fetch_all($OUT_DATA_TOTAL_TIKET, $results['OUT_DATA_TOTAL_TIKET'], null, null, OCI_FETCHSTATEMENT_BY_ROW);
             oci_fetch_all($OUT_DATA_LIST_SLA, $results['OUT_DATA_LIST_SLA'], null, null, OCI_FETCHSTATEMENT_BY_ROW);
             oci_fetch_all($OUT_DATA_TIKET_BY_BULAN, $results['OUT_DATA_TIKET_BY_BULAN'], null, null, OCI_FETCHSTATEMENT_BY_ROW);
+            oci_fetch_all($OUT_TIKET_RESOLVED_AVG, $results['OUT_TIKET_RESOLVED_AVG'], null, null, OCI_FETCHSTATEMENT_BY_ROW);
             //$results = $cursor;
         }else{
             $e = oci_error($stid);
