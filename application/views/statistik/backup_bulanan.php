@@ -207,7 +207,44 @@ $PESAN = $this->session->userdata('PESAN');
     </section><!-- /.content -->
     
 
+<div class="modal fade modal-primary" id="totat_tiket_barchart">
+    <div class="modal-dialog modal-lg" style="width: 90%">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="judul_header">Detail</h4>
+          </div>
+          <div class="modal-body" style="background-color: #FFF !important">
+            <div class="box-body scroll-y">
 
+
+
+
+              <!-- <div id="tb_incident"> -->
+              tes
+
+
+
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="loading_modal">
+      <div class="modal-dialog modal-sm" role="document">
+        <img src="<?php echo base_url('assets/dist/img/ajax-loader.gif');?>" alt="" />
+      </div>
+    </div>
 
     <script type="text/javascript">
   // Bar Chart total tiket
@@ -216,7 +253,7 @@ $PESAN = $this->session->userdata('PESAN');
       type: 'column'
     },
     title: {
-      text: 'Total Tiket'
+      text: "Total Tiket"
     },
     xAxis: {
       categories: [
@@ -247,7 +284,8 @@ $PESAN = $this->session->userdata('PESAN');
       column: {
         grouping: false,
         shadow: false,
-        borderWidth: 0
+        borderWidth: 0,
+        cursor: 'pointer'
       }
     },
     series: [
@@ -262,12 +300,20 @@ $PESAN = $this->session->userdata('PESAN');
       name: 'TOTAL TIKET',
       color: 'rgba(126,86,134,.9)',
       data: [
-<?php foreach ($rs_total_tiket  as $total_tiket) {
+        <?php foreach ($rs_total_tiket  as $total_tiket) {
         echo $total_tiket['TOTAL'].",";
       } ?>
       //140, 90, 40
-      ],
-      pointPadding: 0.1,
+      ], 
+      point: {
+             events: {
+                click: function() {
+                    totat_tiket_barchart(this.category);
+                    // alert ('Category: '+ this.category +', value: '+ this.y);
+                }
+            }
+        },
+      pointPadding: 0.1
 
     }]
   });
@@ -338,7 +384,37 @@ $PESAN = $this->session->userdata('PESAN');
 </script>
 
 
+<script>
+    function totat_tiket_barchart(family) {
+    // alert(family+<?php echo $search['bulan'].$search['tahun']; ?>)
+    document.getElementById("judul_header").innerHTML = "DETAIL TIKET PERBULAN "+family;
 
+    $("#tb_incident").html('<div></div>');
+    var url = "<?php echo base_url('statistik/ajax_get_incident_harian') ?>";
+        //var bidang_id = $(this).prop("lang");
+        $.ajax({
+          type: "POST",
+          url: url,
+          dataType: "html",
+          data: {
+            "family" : family,
+            "BLTH" : "<?php echo $search['bulan'].$search['tahun']; ?>"
+          },
+          beforeSend: function () {
+                // non removable loading
+                $('#loading_modal').modal({
+                  backdrop: 'static', keyboard: false
+                });
+              },
+              success: function (data) {
+                $('#loading_modal').modal('hide');
+                $("#tb_incident").html(data);
+                $('#totat_tiket_barchart').modal('show');
+              }
+            });
+
+      } 
+</script>
 
 
 <!-- ChartJS 1.0.1 -->

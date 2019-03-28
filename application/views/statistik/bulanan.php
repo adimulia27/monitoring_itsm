@@ -61,7 +61,6 @@ $PESAN = $this->session->userdata('PESAN');
                       </div>
                     </div>
                   </div>
-                  <input type="text" name="INTANGGAL" class="form-control" id="INTANGGAL" value="<?php echo $INTANGGAL; ?>" >
                   <div class="col-md-4">
                     <div class="form-group">
                       <div class="col-sm-12">
@@ -218,7 +217,7 @@ $PESAN = $this->session->userdata('PESAN');
       <!-- /.box -->
 
       <div class="modal fade modal-primary" id="modal_family">
-    <div class="modal-dialog modal-lg" style="width: 90%">
+    <div class="modal-dialog modal-lg" style="width: 90%; max-height: 600px;overflow-y: auto;">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -355,7 +354,7 @@ $PESAN = $this->session->userdata('PESAN');
   });
 
 function modal_family(family) {
-    document.getElementById("judul_header").innerHTML = "DETAIL TIKET Perbulan "+family+<?php echo $search['bulan'].$search['tahun']; ?>;
+    document.getElementById("judul_header").innerHTML = "AVERAGE OF RESPONSE TIME RESOLVED ON";
     // alert(<?php echo $search['bulan'].$search['tahun']; ?>);
     $("#tb_incident1").html('<div></div>');
     var url = "<?php echo base_url('statistik/ajax_get_incident_bulanan') ?>";

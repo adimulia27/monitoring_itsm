@@ -83,7 +83,7 @@ function modal_family(family) {
 
       } 
   function modal_grafik(family) {
-    document.getElementById("judul_header").innerHTML = "DETAIL TIKET"+family;
+    document.getElementById("judul_header").innerHTML = "DETAIL TIKET "+family;
 
     $("#head h3").empty();
     $("#tabel_detail tbody").empty();

@@ -680,7 +680,8 @@ public function get_total_tiket() {
     }
 
     // DATA STATISTIK PERBULAN
-    public function get_pkg_incident_perbulan($params){
+    public function get_pkg_incident_perbulan($blth,$family){
+        // $family2 = '24. AGO';
         $msg_out = '';
         $results = '';
         $this->pblmig_db = $this->load->database('pblmig', true);
@@ -689,14 +690,15 @@ public function get_total_tiket() {
             trigger_error(htmlentities($m['message']), E_USER_ERROR);
         }
 
-        $stid = oci_parse($this->pblmig_db->conn_id, 'begin OPHARAPP.PKG_TESTING.GET_DATA_INCIDENT_PERBULAN(:IN_BLTH, :OUT_DATA_TOTAL_TIKET, :OUT_DATA_LIST_SLA, :OUT_DATA_TIKET_BY_BULAN, :OUT_TIKET_TOTAL, :OUT_TIKET_OVERSLA, :OUT_TIKET_RESOLVED, :OUT_TIKET_RESOLVED_AVG, :OUT_MESSAGE); end;');
+        $stid = oci_parse($this->pblmig_db->conn_id, 'begin OPHARAPP.PKG_TESTING.GET_DATA_INCIDENT_PERBULAN2(:IN_BLTH, :IN_SERVICEFAMILY, :OUT_DATA_TOTAL_TIKET, :OUT_DATA_LIST_SLA, :OUT_DATA_TIKET_BY_BULAN, :OUT_TIKET_TOTAL, :OUT_TIKET_OVERSLA, :OUT_TIKET_RESOLVED, :OUT_TIKET_RESOLVED_AVG, :OUT_MESSAGE); end;');
         $OUT_DATA_TOTAL_TIKET = oci_new_cursor($this->pblmig_db->conn_id);
         $OUT_DATA_LIST_SLA = oci_new_cursor($this->pblmig_db->conn_id);
         $OUT_DATA_TIKET_BY_BULAN = oci_new_cursor($this->pblmig_db->conn_id);
         $OUT_TIKET_RESOLVED_AVG = oci_new_cursor($this->pblmig_db->conn_id);
 
         //Send parameters variable  value  lenght
-        oci_bind_by_name($stid, ':IN_BLTH', $params) or die('Error binding IN_BLTH');
+        oci_bind_by_name($stid, ':IN_BLTH', $blth) or die('Error binding IN_BLTH');
+        oci_bind_by_name($stid, ':IN_SERVICEFAMILY', $family) or die('Error binding IN_SERVICEFAMILY');
         oci_bind_by_name($stid, ':OUT_DATA_TOTAL_TIKET', $OUT_DATA_TOTAL_TIKET,-1, OCI_B_CURSOR) or die('Error bind OUT_DATA');
         oci_bind_by_name($stid, ':OUT_DATA_LIST_SLA', $OUT_DATA_LIST_SLA,-1, OCI_B_CURSOR) or die('Error binding OUT_DATA');
         oci_bind_by_name($stid, ':OUT_DATA_TIKET_BY_BULAN', $OUT_DATA_TIKET_BY_BULAN,-1, OCI_B_CURSOR) or die('Error binding OUT_DATA');
@@ -720,7 +722,8 @@ public function get_total_tiket() {
         }else{
             $e = oci_error($stid);
             $results =  $e['message'];
-        } 
+        }
+
         oci_free_statement($stid);
         oci_close($this->pblmig_db->conn_id);
 

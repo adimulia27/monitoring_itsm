@@ -287,7 +287,7 @@ public function ajax_get_detail() {
                         <td class="bg-light-blue"  width="110px" >SERVICETYPE : </td>
                         <td width="250px"  style="padding-left:10px">' . $item['SERVICETYPE'] . '</td>
                         <td width="50px"><span class="badge bg-red">' . $item['RECORD'] . '</span></td>
-                        <td>tes</td>
+                        <td></td>
                       </tr>
                     </tbody>
                 </table> 
@@ -578,7 +578,7 @@ public function ajax_get_detail() {
                         <td class="bg-light-blue"  width="110px" >SERVICETYPE : </td>
                         <td width="250px"  style="padding-left:10px">' . $item['SERVICETYPE'] . '</td>
                         <td width="50px"><span class="badge bg-red">' . $item['RECORD'] . '</span></td>
-                        <td>tes</td>
+                        <td></td>
                       </tr>
                     </tbody>
                 </table> 
@@ -777,19 +777,13 @@ public function ajax_get_detail() {
 
     public function ajax_get_incident_bulanan() {
 
-        // $family = $this->input->post('family');
-        $family = '';
+        $family = $this->input->post('family');
         $blth = $this->input->post('BLTH');
 
         // $INTANGGAL = substr($tgl, 6,4).substr($tgl, 3,2).substr($tgl, 0,2);
         // ---------------------------------------- Grid 1  Start ----------------------------------- //
         
-        // $params = array(
-        //     'IN_BLTH' => $blth, 
-        //     'SERVICEFAMILY' => $family,
-        // );
-
-        $data = $this->mstatistik->get_pkg_incident_perbulan($blth,$family);
+        $data = $this->mstatistik->get_pkg_incident_perbulan($blth);
          // BUILD HTML
 
         // table
@@ -803,7 +797,7 @@ public function ajax_get_detail() {
 
                 $id_collapse = $id_collapse .'child'. $no++;
                 $html .= '
-                    <table class="table table-responsive w-auto" style="overflow-y:scroll;">
+                    <table class="table table-responsive w-auto">
                     <tbody>
                       <tr class="success">
                         <td class="bg-light-blue" scope="row" width="40px">
@@ -812,67 +806,125 @@ public function ajax_get_detail() {
                           </a>
                         </td>
 
-                        <td class="bg-light-blue"  width="150px" style="padding-left:10px;color:black;">' . $item['SERVICEFAMILY'] . ' <span class="badge bg-red">' . $item['TOTAL'] . '</span></td>
-                        <td style="padding-left:10px;color:black;"></td>
+                        <td class="bg-light-blue"  width="150px" >SERVICEFAMILY : </td>
+                        <td style="padding-left:10px;color:black;">' . $item['SERVICEFAMILY'] . ' <span class="badge bg-red">' . $item['TOTAL'] . '</span></td>
                       </tr>
                     </tbody>
                 </table> 
                                   
 
-                  <div class="pohon1 collapse" id="'.$id_collapse.'">
-                    <div class="card card-body">';
-                                        
+                  <div class="collapse" id="'.$id_collapse.'">
+                    <div class="card card-body">
+                                        ';
 
 
                                         // ---------------------------------------- Grid 3  Start ----------------------------------- //
                             
-                            // $params = array(
-                            //     'IN_BLTH' => $blth, 
-                            //     'SERVICEFAMILY' => $item['SERVICEFAMILY'],
-                            // );
-
-                            $family = $item['SERVICEFAMILY'];
-
-                            $data = $this->mstatistik->get_pkg_incident_perbulan($blth, $family);                    
+                            $data = $this->mstatistik->get_pkg_incident_perbulan($blth);                    
                                                   
                             $no = 1;
                             if (count($data) > 0) {
                                 // header table detail
                                 $html .= '
-                                <div class="table-responsive" style="max-height:200px;overflow-x:true; overflow-y: scroll;width:100%;font-size:12px;">
+                                <div class="table-responsive" style="overflow-x:true; width:100%">
                                 <table class="table table-bordered table-hover table-striped w-auto detil">
                                     <thead>
-                                        <tr style="color:black;">
-                                            <th>BULAN</th>
+                                        <tr>
+                                            <th>INCIDENT</th>
+                                            <th> PRIORITYNAME </th>
+                                            <th> SLACLASS </th>
+                                            <th style="padding: 0 50px">CASEOWNER</th>
+                                            <th>CASEOWNEREMAIL</th>
+                                            <th>UNITINDUK</th>
+                                            <th>UNITPELAKSANA</th>
+                                            <th>UNITSUBPELAKSANA</th>
+                                            <th>COMPLAINANT</th>
+                                            <th>COMPLAINANTEMAIL</th>
+                                            <th style="padding: 0 100px">SUMMARY</th>
+                                            <th>SOURCE</th>             
+                                            <th>CALLTYPE</th>               
+                                            <th>STATUS</th>
+                                            <th>DESCRIPTION</th>
                                             <th>SERVICEFAMILY</th>
                                             <th>SERVICEGROUP</th>
-                                            <th>PRIORITYNAME</th>
-                                            <th>TOTALTIKET</th>
-                                            <th>MINOFRESPONTIMERESOLVEDON</th>
-                                            <th>MAXOFRESPONTIMERESOLVEDON</th>
-                                            <th>AVERAGEOFRESPONTIMERESOLVEDON</th>
+                                            <th>SERVICETYPE</th>
+                                            <th> CAUSE </th>
+                                            <th> CAUSECODE </th>
+                                            <th> RESOLUTION </th>
+                                            <th> CREATEDBY </th>
+                                            <th> CREATEDON </th>
+                                            <th> TASKCREATEDON </th>
+                                            <th> ASSIGNEDON </th>
+                                            <th> ASSIGNTO </th>
+                                            <th> RESOLVEDBY </th>
+                                            <th> RESOLVEDON </th>
+                                            <th> AVG. RESPON TIME RESOLVEDON </th>
+                                            <th> MODIFIEDBY </th>
+                                            <th> MODIFIEDON </th>
+                                            <th> CLOSEDBY </th>
+                                            <th> CLOSEDDATE </th>
+                                            <th> PRIORITY </th>
+                                            <th> SLALEVEL180PERSEN </th>
+                                            <th> SLALEVEL1 </th>
+                                            <th> SLALEVEL2 </th>
+                                            <th> SLALEVEL3 </th>
+                                            <th> FIRSTCALLRESOLUTION </th>
+                                            <th> TGLUPLOAD </th>
+                                            <th> UPLOADBY </th>
                                         </tr>
                                     </thead>
                                     <tbody>';
-
 
                                 foreach ($data['OUT_TIKET_RESOLVED_AVG'] AS $item) {
 
                                     $html .= '
                                                         
                                                             
-                                        <tr style="color:black;">
-                                            <td>'.$item["BULAN"].'</td>
-                                            <td>'.$item["SERVICEFAMILY "].'</td>
+                                        <tr>
+                                            <td>'. number_format($item['INCIDENT'], 0, '', '') .'</td>
+                                            <td>'.$item[" PRIORITYNAME "].'</td>
+                                            <td>'.$item[" SLACLASS "].'</td>
+                                            <td>'.$item[" UNITINDUK "].'</td>
+                                            <td>'.$item["UNITPELAKSANA"].'</td>
+                                            <td>'.$item["UNITSUBPELAKSANA"].'</td>
+                                            <td>'.$item["CASEOWNER"].'</td>
+                                            <td>'.$item["CASEOWNEREMAIL"].'</td>
+                                            <td>'.$item["COMPLAINANT"].'</td>
+                                            <td>'.$item["COMPLAINANTEMAIL"].'</td>
+                                            <td>'.$item["SUMMARY"].'</td>
+                                            <td>'.$item["SOURCE"].'</td>             
+                                            <td>'.$item["CALLTYPE"].'</td>               
+                                            <td>'.$item["STATUS"].'</td>
+                                            <td>'.$item["DESCRIPTION"].'</td>
+                                            <td>'.$item["SERVICEFAMILY"].'</td>
                                             <td>'.$item["SERVICEGROUP"].'</td>
-                                            <td>'.$item["PRIORITYNAME"].'</td>
-                                            <td>'.$item["TOTALTIKET"].'</td>
-                                            <td>'.$item["MINOFRESPONTIMERESOLVEDON"].'</td>
-                                            <td>'.$item["MAXOFRESPONTIMERESOLVEDON"].'</td>
-                                            <td>'.$item["AVERAGEOFRESPONTIMERESOLVEDON"].'</td>
+                                            <td>'.$item["SERVICETYPE"].'</td>
+                                            <td>'.$item[" CAUSE "].'</td>
+                                            <td>'.$item[" CAUSECODE "].'</td>
+                                            <td>'.$item[" RESOLUTION "].'</td>
+                                            <td>'.$item[" CREATEDBY "].'</td>
+                                            <td>'.$item[" CREATEDON "].'</td>
+                                            <td>'.$item[" TASKCREATEDON "].'</td>
+                                            <td>'.$item[" ASSIGNTO "].'</td>
+                                            <td>'.$item[" ASSIGNEDON "].'</td>
+                                            <td>'.$item[" RESOLVEDBY "].'</td>
+                                            <td>'.$item[" RESOLVEDON "].'</td>
+                                            <td>'.$item[" AverageofResponTimeResolvedOn "].'</td>
+                                            <td>'.$item[" MODIFIEDBY "].'</td>
+                                            <td>'.$item[" MODIFIEDON "].'</td>
+                                            <td>'.$item[" CLOSEDBY "].'</td>
+                                            <td>'.$item[" CLOSEDDATE "].'</td>
+                                            <td>'.$item[" PRIORITY "].'</td>
+                                            <td>'.$item[" SLALEVEL180PERSEN "].'</td>
+                                            <td>'.$item[" SLALEVEL1 "].'</td>
+                                            <td>'.$item[" SLALEVEL2 "].'</td>
+                                            <td>'.$item[" SLALEVEL3 "].'</td>
+                                            <td>'.$item[" FIRSTCALLRESOLUTION "].'</td>
+                                            <td>'.$item[" TGLUPLOAD "].'</td>
+                                            <td>'.$item[" UPLOADBY "].'</td>
                                         </tr>';
 
-                                }
+                                } // foreach 3
                                 // tutup table
                                 $html .= '
                                         </tbody>
